@@ -28,17 +28,33 @@ public class UDPReceive : MonoBehaviour
 
     UdpClient client;
 
-    private string IP = "192.168.2.10";
+    public string IP = "192.168.2.10";
     private int port = 8051;
 
-    private float xpos = 0;
-    private float ypos = 0;
-    private float ori = 0;
+    public float xpos = 0;
+    public float ypos = 0;
+    public float ori = 0;
 
-    private float fieldX = 10;
-    private float fieldY = 10;
+    public float fieldX = 10;
+    public float fieldY = 10;
+    public float scale = 1;
+
+    public float cameraHeight = 0.2f;
+
+    private float fieldBorderThickness = 0.001f;
+    public float borderWidth = 1;
+
+    private bool initilized = false;
 
     private string lastReceivedUDPPacket = "";
+
+    private GameObject maincamera;
+    private GameObject field;
+    private GameObject fieldXaxis;
+    private GameObject fieldYaxis;
+    private GameObject fieldXplus;
+    private GameObject fieldYplus;
+    private GameObject postmax;
 
 
     private static void Main()
@@ -57,13 +73,39 @@ public class UDPReceive : MonoBehaviour
     {
         UDPInitilize();
         print("UDPInitilize() complete");
+
+        maincamera = GameObject.FindGameObjectWithTag("MainCamera");
+        field = GameObject.FindGameObjectWithTag("Field");
+        fieldXaxis = GameObject.FindGameObjectWithTag("FieldXaxis");
+        fieldYaxis = GameObject.FindGameObjectWithTag("FieldYaxis");
+        fieldXplus = GameObject.FindGameObjectWithTag("FieldXplus");
+        fieldYplus = GameObject.FindGameObjectWithTag("FieldYplus");
+
+        postmax = GameObject.FindGameObjectWithTag("LEDPostMax");
     }
 
     private void Update()
     {
-        GameObject maincamera = GameObject.FindGameObjectWithTag("MainCamera");
-        maincamera.transform.position = new Vector3(xpos, 0, ypos);
-        maincamera.transform.rotation = new Quaternion(0, ori, 0, 0);
+        if (initilized)
+        {
+            maincamera.transform.position = new Vector3(xpos, cameraHeight, ypos);
+            maincamera.transform.rotation = new Quaternion(0, ori, 0, 0);
+        }
+        else
+        {
+            field.transform.localScale = new Vector3(scale, scale, scale);
+            fieldXaxis.transform.localScale = new Vector3(fieldX, fieldBorderThickness, borderWidth);
+            fieldYaxis.transform.localScale = new Vector3(borderWidth, fieldBorderThickness, fieldY);
+            fieldXplus.transform.localScale = new Vector3(fieldX, fieldBorderThickness, borderWidth);
+            fieldYplus.transform.localScale = new Vector3(borderWidth, fieldBorderThickness, fieldY);
+
+            fieldXaxis.transform.position = new Vector3(scale * (fieldX / 2), 0, scale * (-borderWidth / 2));
+            fieldYaxis.transform.position = new Vector3(scale * (-borderWidth / 2), 0, scale * (fieldY / 2));
+            fieldXplus.transform.position = new Vector3(scale * (fieldX / 2), 0, scale * (fieldX + borderWidth / 2));
+            fieldYplus.transform.position = new Vector3(scale * (fieldY + borderWidth / 2), 0, scale * (fieldY / 2));
+
+            postmax.transform.position = new Vector3(scale * fieldX, 0.25f, scale * fieldY);
+        }
     }
 
     void OnGUI()
@@ -93,7 +135,6 @@ public class UDPReceive : MonoBehaviour
     {
         client = new UdpClient(port);
         IPEndPoint anyIP = new IPEndPoint(IPAddress.Parse(IP), port);
-        bool initilized = false;
         string text = "";
         do
         {
@@ -110,7 +151,8 @@ public class UDPReceive : MonoBehaviour
                 }
                 else
                 {
-                    initilized = GetInit(text);
+                    GetInit(text);
+                    initilized = true;
                 }
 
                 print(">> " + text);
@@ -124,27 +166,27 @@ public class UDPReceive : MonoBehaviour
         } while (text != "EXIT");
     }
 
-    private bool GetInit(string text)
+    private void GetInit(string text)
     {
+        //"INIT X:000 Y:000 S:000"
         string[] textsplit = text.Split(':', ' ');
         if (textsplit[0] == "INIT")
         {
-            fieldX = Int32.Parse(textsplit[2]) / (float)10.0;
-            fieldY = Int32.Parse(textsplit[4]) / (float)10.0;
-
-            return true;
+            fieldX = Int32.Parse(textsplit[2]);
+            fieldY = Int32.Parse(textsplit[4]);
+            scale = Int32.Parse(textsplit[6]);
         }
-        return false;
     }
 
     private void GetData(string text)
     {
+        //"DATA X:000 Y:000 O:000"
         string[] textsplit = text.Split(':', ' ');
         if (textsplit[0] == "DATA")
         {
-            xpos = Int32.Parse(textsplit[1]) / (float)10.0;
-            ypos = Int32.Parse(textsplit[3]) / (float)10.0;
-            ori = Int32.Parse(textsplit[5]) / (float)10.0;
+            xpos = Int32.Parse(textsplit[1]);
+            ypos = Int32.Parse(textsplit[3]);
+            ori = Int32.Parse(textsplit[5]);
         }
         else if (textsplit[0] == "INIT")
         {
