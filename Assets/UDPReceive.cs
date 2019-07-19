@@ -45,6 +45,7 @@ public class UDPReceive : MonoBehaviour
     public float borderWidth = 1;
 
     private bool initilized = false;
+    private bool ackFlag = false;
 
     private string lastReceivedUDPPacket = "";
 
@@ -57,18 +58,6 @@ public class UDPReceive : MonoBehaviour
     private GameObject postmax;
 
 
-    private static void Main()
-    {
-        UDPReceive receiveObj = new UDPReceive();
-        receiveObj.UDPInitilize();
-
-        string text = "";
-        do
-        {
-            text = Console.ReadLine();
-        }
-        while (!text.Equals("EXIT"));
-    }
     public void Start()
     {
         UDPInitilize();
@@ -117,6 +106,13 @@ public class UDPReceive : MonoBehaviour
         GUI.Box(rectObj, "# UDPReceive\n"+ IP +" " + port + " \n" + "\nLast Packet: \n" + lastReceivedUDPPacket, style);
     }
 
+    void OnApplicationQuit()
+    {
+        SendUDP("STOP");
+        ReceiveACK();
+        Debug.Log("Application ending after " + Time.time + " seconds shutting down pi code");
+    }
+
     private void UDPInitilize()
     {
         print("UDPReceive.init()");
@@ -129,6 +125,18 @@ public class UDPReceive : MonoBehaviour
         receiveThread.IsBackground = true;
         receiveThread.Start();
 
+    }
+
+    private void ReceiveACK()
+    {
+        while (!ackFlag) { }
+        ackFlag = false;
+    }
+
+    private void SendUDP(string command)
+    {
+        byte[] bCommand = Encoding.ASCII.GetBytes(command);
+        client.Send(bCommand, bCommand.Length);
     }
 
     private void ReceiveUDP()
@@ -175,6 +183,10 @@ public class UDPReceive : MonoBehaviour
             fieldX = Int32.Parse(textsplit[2]);
             fieldY = Int32.Parse(textsplit[4]);
             scale = Int32.Parse(textsplit[6]);
+        }
+        else if (textsplit[0] == "ACK")
+        {
+            ackFlag = true;
         }
     }
 
