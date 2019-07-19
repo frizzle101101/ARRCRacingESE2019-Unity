@@ -5,6 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - _udp
+  - Field
+  - FieldXaxis
+  - FieldYaxis
+  - FieldXplus
+  - FieldYplus
+  - LEDPostMax
   layers:
   - Default
   - TransparentFX
