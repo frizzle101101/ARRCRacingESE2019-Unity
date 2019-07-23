@@ -24,25 +24,31 @@ using System.Threading;
 
 public class UDPReceive : MonoBehaviour
 {
-    Thread receiveThread;
+    private Thread receiveThread;
 
-    UdpClient client;
+    private UdpClient client;
 
-    public string IP = "192.168.2.10";
-    private int port = 8051;
+    private string IP = "192.168.1.124";
+    private int port = 8049;
 
-    public float xpos = 0;
-    public float ypos = 0;
-    public float ori = 0;
+    private float xpos = 0;
+    private float ypos = 0;
+    private float ori = 0;
 
-    public float fieldX = 10;
-    public float fieldY = 10;
-    public float scale = 1;
+    private float fieldX = 254.3f;
+    private float fieldY = 278.286f;
+    private float scale = 0.275f;
 
-    public float cameraHeight = 0.2f;
+    public float cameraHeight = 12.23f;
 
     private float fieldBorderThickness = 0.001f;
-    public float borderWidth = 1;
+    public float borderWidth = 10;
+
+    public float cameraXAngleAdjust = 6.92f;
+    public float cameraZAngleAdjust = 1.62f;
+
+    public float cubeTest = 65f;
+
 
     private bool initilized = false;
     private bool ackFlag = false;
@@ -56,6 +62,7 @@ public class UDPReceive : MonoBehaviour
     private GameObject fieldXplus;
     private GameObject fieldYplus;
     private GameObject postmax;
+    private GameObject cubetest;
 
 
     public void Start()
@@ -71,30 +78,42 @@ public class UDPReceive : MonoBehaviour
         fieldYplus = GameObject.FindGameObjectWithTag("FieldYplus");
 
         postmax = GameObject.FindGameObjectWithTag("LEDPostMax");
+        cubetest = GameObject.FindGameObjectWithTag("CubeTest");
     }
 
     private void Update()
     {
-        if (initilized)
-        {
-            maincamera.transform.position = new Vector3(xpos, cameraHeight, ypos);
-            maincamera.transform.rotation = new Quaternion(0, ori, 0, 0);
-        }
-        else
-        {
-            field.transform.localScale = new Vector3(scale, scale, scale);
-            fieldXaxis.transform.localScale = new Vector3(fieldX, fieldBorderThickness, borderWidth);
-            fieldYaxis.transform.localScale = new Vector3(borderWidth, fieldBorderThickness, fieldY);
-            fieldXplus.transform.localScale = new Vector3(fieldX, fieldBorderThickness, borderWidth);
-            fieldYplus.transform.localScale = new Vector3(borderWidth, fieldBorderThickness, fieldY);
+        
 
-            fieldXaxis.transform.position = new Vector3(scale * (fieldX / 2), 0, scale * (-borderWidth / 2));
-            fieldYaxis.transform.position = new Vector3(scale * (-borderWidth / 2), 0, scale * (fieldY / 2));
-            fieldXplus.transform.position = new Vector3(scale * (fieldX / 2), 0, scale * (fieldX + borderWidth / 2));
-            fieldYplus.transform.position = new Vector3(scale * (fieldY + borderWidth / 2), 0, scale * (fieldY / 2));
-
-            postmax.transform.position = new Vector3(scale * fieldX, 0.25f, scale * fieldY);
+        //if (initilized)
+        {
+            maincamera.transform.position = new Vector3(scale * xpos, scale * cameraHeight, scale * ypos);
+            maincamera.transform.localEulerAngles = new Vector3(cameraXAngleAdjust, ori, cameraZAngleAdjust);
+            cubetest.transform.position = new Vector3(scale * (fieldX / 2), scale * (cubeTest / 2), scale * (fieldY / 2));
+            cubetest.transform.localScale = new Vector3(scale * cubeTest , scale * cubeTest , scale * cubeTest );
         }
+        //else
+        {
+            Vector3 scaleVector = new Vector3(scale, scale, scale);
+
+            //field.transform.localScale = scaleVector;
+            fieldXaxis.transform.localScale = new Vector3(scale * fieldX, scale * fieldBorderThickness, scale * borderWidth);
+            fieldYaxis.transform.localScale = new Vector3(scale * borderWidth, scale * fieldBorderThickness, scale * fieldY);
+            fieldXplus.transform.localScale = new Vector3(scale * fieldX, scale * fieldBorderThickness, scale * borderWidth);
+            fieldYplus.transform.localScale = new Vector3(scale * borderWidth, scale * fieldBorderThickness, scale * fieldY);
+            
+            fieldXaxis.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (-borderWidth / 2));
+            fieldYaxis.transform.localPosition = new Vector3(scale * (-borderWidth / 2), 0, scale * (fieldY / 2));
+            fieldXplus.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (fieldY + borderWidth / 2));
+            fieldYplus.transform.localPosition = new Vector3(scale * (fieldX + borderWidth / 2), 0, scale * (fieldY / 2));
+
+            postmax.transform.localPosition = new Vector3(scale * fieldX, scale * 0.25f, scale * fieldY);
+
+            
+
+            initilized = true;
+        }
+
     }
 
     void OnGUI()
@@ -108,17 +127,16 @@ public class UDPReceive : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        SendUDP("STOP");
-        ReceiveACK();
-        Debug.Log("Application ending after " + Time.time + " seconds shutting down pi code");
+        SendUDP("SHUTDOWN");
+        //ReceiveACK();
+        print("Application ending sending SHUTDOWN, disconecting...");
+        //client.Close();
     }
 
     private void UDPInitilize()
     {
         print("UDPReceive.init()");
-
-        port = 8051;
-
+        
         print("Receiving " + IP + port);
 
         receiveThread = new Thread(new ThreadStart(ReceiveUDP));
@@ -142,30 +160,25 @@ public class UDPReceive : MonoBehaviour
     private void ReceiveUDP()
     {
         client = new UdpClient(port);
-        IPEndPoint anyIP = new IPEndPoint(IPAddress.Parse(IP), port);
+        IPEndPoint ipendpoint = new IPEndPoint(IPAddress.Parse(IP), port);
+        client.Connect(ipendpoint);
         string text = "";
         do
         {
             try
             {
-                
-                byte[] data = client.Receive(ref anyIP);
+
+                byte[] data = client.Receive(ref ipendpoint);
 
                 text = Encoding.ASCII.GetString(data);
-
-                if(initilized)
-                {
-                    GetData(text);
-                }
-                else
-                {
-                    GetInit(text);
-                    initilized = true;
-                }
 
                 print(">> " + text);
 
                 lastReceivedUDPPacket = text;
+
+                GetData(text);
+
+                
             }
             catch (Exception err)
             {
@@ -173,36 +186,33 @@ public class UDPReceive : MonoBehaviour
             }
         } while (text != "EXIT");
     }
-
-    private void GetInit(string text)
-    {
-        //"INIT X:000 Y:000 S:000"
-        string[] textsplit = text.Split(':', ' ');
-        if (textsplit[0] == "INIT")
-        {
-            fieldX = Int32.Parse(textsplit[2]);
-            fieldY = Int32.Parse(textsplit[4]);
-            scale = Int32.Parse(textsplit[6]);
-        }
-        else if (textsplit[0] == "ACK")
-        {
-            ackFlag = true;
-        }
-    }
+   
 
     private void GetData(string text)
     {
         //"DATA X:000 Y:000 O:000"
+        text.Replace('.', ',');
         string[] textsplit = text.Split(':', ' ');
         if (textsplit[0] == "DATA")
         {
-            xpos = Int32.Parse(textsplit[1]);
-            ypos = Int32.Parse(textsplit[3]);
-            ori = Int32.Parse(textsplit[5]);
+            xpos = float.Parse(textsplit[2]);
+            ypos = float.Parse(textsplit[4]);
+            ori = float.Parse(textsplit[6]);
         }
         else if (textsplit[0] == "INIT")
         {
-            GetInit(text);
+            fieldX = float.Parse(textsplit[2]);
+            fieldY = float.Parse(textsplit[4]);
+            scale = float.Parse(textsplit[6])/5.0f;
+        }
+        else if (textsplit[0] == "SHUTDOWN")
+        {
+            print("SHUTDOWN Command detected, Sending ACK");
+            SendUDP("ACK");
+        }
+        else if (textsplit[0] == "SHUTDOWN!")
+        {
+            print("SHUTDOWN! Command detected");
         }
     }
 }

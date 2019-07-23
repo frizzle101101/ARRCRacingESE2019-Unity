@@ -11,6 +11,7 @@ TagManager:
   - FieldXplus
   - FieldYplus
   - LEDPostMax
+  - CubeTest
   layers:
   - Default
   - TransparentFX
