@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{24A9654D-72D3-B148-02D9-EC9F1345B782}</ProjectGuid>
+    <ProjectGuid>{C0F20A84-3D8D-2CE9-6E90-CD9CFA91E8B5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>VuforiaEditorScripts</AssemblyName>
@@ -302,28 +302,28 @@
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
     <Reference Include="SyntaxTree.Mono.Cecil">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Assets/UnityVS/Editor/SyntaxTree.Mono.Cecil.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Assets/UnityVS/Editor/SyntaxTree.Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Advertisements">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.ads@2.3.1/Editor/UnityEditor.Advertisements.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.ads@2.3.1/Editor/UnityEditor.Advertisements.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Advertisements">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Advertisements.Editor">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.Editor.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.StandardEvents.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.analytics@3.2.2/Unity.Analytics.Tracker.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.Purchasing">
-      <HintPath>C:/Users/Kyle/Documents/GitHub/ARRCRacingESE2019/Library/PackageCache/com.unity.purchasing@2.0.3/Editor/UnityEditor.Purchasing.dll</HintPath>
+      <HintPath>F:/Users/Aaron/Documents/Unity Projects/ARRCRacing/Library/PackageCache/com.unity.purchasing@2.0.3/Editor/UnityEditor.Purchasing.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -682,7 +682,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="VuforiaScripts.csproj">
-      <Project>{2F6DA6BC-06C0-8ACB-E233-521723F1D8F3}</Project>
+      <Project>{680EC4ED-BC25-547B-D16B-D177619BED1E}</Project>
       <Name>VuforiaScripts</Name>
     </ProjectReference>
   </ItemGroup>

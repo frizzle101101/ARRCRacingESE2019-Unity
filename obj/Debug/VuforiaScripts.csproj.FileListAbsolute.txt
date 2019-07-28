@@ -297,7 +297,6 @@ F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\obj\Debug\VuforiaScripts.cspr
 F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\obj\Debug\VuforiaScripts.csproj.CopyComplete
 F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\obj\Debug\VuforiaScripts.dll
 F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\obj\Debug\VuforiaScripts.pdb
-F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\Temp\bin\Debug\UnityEditor.Android.Extensions.dll
 C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\Temp\bin\Debug\VuforiaScripts.dll
 C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\Temp\bin\Debug\VuforiaScripts.pdb
 C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\Temp\bin\Debug\Microsoft.Win32.Primitives.dll
@@ -599,3 +598,5 @@ C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\obj\Debug\VuforiaScripts.csproj
 C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\obj\Debug\VuforiaScripts.dll
 C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\obj\Debug\VuforiaScripts.pdb
 C:\Users\Kyle\Documents\GitHub\ARRCRacingESE2019\Temp\bin\Debug\SyntaxTree.Mono.Cecil.dll
+F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\Temp\bin\Debug\SyntaxTree.Mono.Cecil.dll
+F:\Users\Aaron\Documents\Unity Projects\ARRCRacing\obj\Debug\VuforiaScripts.csprojAssemblyReference.cache

@@ -16,7 +16,6 @@
 using UnityEngine;
 using System.Collections;
 
-using System;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
@@ -28,44 +27,50 @@ public class UDPReceive : MonoBehaviour
 
     private UdpClient client;
 
-    private string IP = "192.168.1.124";
-    private int port = 8049;
+    private static string IP = "192.168.1.124";
+    private static int port = 8049;
 
-    private float xpos = 0;
-    private float ypos = 0;
-    private float ori = 0;
+    private static float xpos = 0;
+    private static float ypos = 0;
+    private static float ori = 0;
 
-    private float fieldX = 254.3f;
-    private float fieldY = 278.286f;
-    private float scale = 0.275f;
+    private static float fieldX = 254.3f;
+    private static float fieldY = 278.286f;
+    private static float scale = 0.275f;
+    private static float fieldBorderThickness = 0.001f;
 
-    public float cameraHeight = 12.23f;
+    private static float cubePosX = fieldX / 2;
+    private static float cubePosY = fieldY / 2;
 
-    private float fieldBorderThickness = 0.001f;
+    public float cameraHeight = 12.23f;    
     public float borderWidth = 10;
-
     public float cameraXAngleAdjust = 6.92f;
     public float cameraZAngleAdjust = 1.62f;
+    public float cubeSize = 23.49f;
+    public bool freeCamera = false;
+    public float gamePlayTime = 30;
 
-    public float cubeTest = 65f;
+    private static bool ackFlag = false;
+
+    private static bool gameStarted = false;
+    private static float gameStartTime = 0;
+    private static float timeLeftInGame = 0;
+
+    private static string lastReceivedUDPPacket = "";
+
+    private static int score = 0;
+
+    private static GameObject maincamera;
+    private static GameObject field;
+    private static GameObject fieldXaxis;
+    private static GameObject fieldYaxis;
+    private static GameObject fieldXplus;
+    private static GameObject fieldYplus;
+    private static GameObject postmax;
+    private static GameObject cubeObj;
 
 
-    private bool initilized = false;
-    private bool ackFlag = false;
-
-    private string lastReceivedUDPPacket = "";
-
-    private GameObject maincamera;
-    private GameObject field;
-    private GameObject fieldXaxis;
-    private GameObject fieldYaxis;
-    private GameObject fieldXplus;
-    private GameObject fieldYplus;
-    private GameObject postmax;
-    private GameObject cubetest;
-
-
-    public void Start()
+    private void Start()
     {
         UDPInitilize();
         print("UDPInitilize() complete");
@@ -78,59 +83,103 @@ public class UDPReceive : MonoBehaviour
         fieldYplus = GameObject.FindGameObjectWithTag("FieldYplus");
 
         postmax = GameObject.FindGameObjectWithTag("LEDPostMax");
-        cubetest = GameObject.FindGameObjectWithTag("CubeTest");
+        cubeObj = GameObject.FindGameObjectWithTag("CubeTest");
     }
 
     private void Update()
     {
-        
-
-        //if (initilized)
+        if (freeCamera == false)
         {
             maincamera.transform.position = new Vector3(scale * xpos, scale * cameraHeight, scale * ypos);
             maincamera.transform.localEulerAngles = new Vector3(cameraXAngleAdjust, ori, cameraZAngleAdjust);
-            cubetest.transform.position = new Vector3(scale * (fieldX / 2), scale * (cubeTest / 2), scale * (fieldY / 2));
-            cubetest.transform.localScale = new Vector3(scale * cubeTest , scale * cubeTest , scale * cubeTest );
         }
-        //else
+        cubeObj.transform.position = new Vector3(scale * cubePosX, scale * (cubeSize / 2), scale * cubePosY);
+        cubeObj.transform.localScale = new Vector3(scale * cubeSize , scale * cubeSize , scale * cubeSize );
+        fieldXaxis.transform.localScale = new Vector3(scale * fieldX, scale * fieldBorderThickness, scale * borderWidth);
+        fieldYaxis.transform.localScale = new Vector3(scale * borderWidth, scale * fieldBorderThickness, scale * fieldY);
+        fieldXplus.transform.localScale = new Vector3(scale * fieldX, scale * fieldBorderThickness, scale * borderWidth);
+        fieldYplus.transform.localScale = new Vector3(scale * borderWidth, scale * fieldBorderThickness, scale * fieldY);
+            
+        fieldXaxis.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (-borderWidth / 2));
+        fieldYaxis.transform.localPosition = new Vector3(scale * (-borderWidth / 2), 0, scale * (fieldY / 2));
+        fieldXplus.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (fieldY + borderWidth / 2));
+        fieldYplus.transform.localPosition = new Vector3(scale * (fieldX + borderWidth / 2), 0, scale * (fieldY / 2));
+
+        postmax.transform.localPosition = new Vector3(scale * fieldX, scale * 0.25f, scale * fieldY);
+
+        if(gameStarted)
         {
-            Vector3 scaleVector = new Vector3(scale, scale, scale);
-
-            //field.transform.localScale = scaleVector;
-            fieldXaxis.transform.localScale = new Vector3(scale * fieldX, scale * fieldBorderThickness, scale * borderWidth);
-            fieldYaxis.transform.localScale = new Vector3(scale * borderWidth, scale * fieldBorderThickness, scale * fieldY);
-            fieldXplus.transform.localScale = new Vector3(scale * fieldX, scale * fieldBorderThickness, scale * borderWidth);
-            fieldYplus.transform.localScale = new Vector3(scale * borderWidth, scale * fieldBorderThickness, scale * fieldY);
-            
-            fieldXaxis.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (-borderWidth / 2));
-            fieldYaxis.transform.localPosition = new Vector3(scale * (-borderWidth / 2), 0, scale * (fieldY / 2));
-            fieldXplus.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (fieldY + borderWidth / 2));
-            fieldYplus.transform.localPosition = new Vector3(scale * (fieldX + borderWidth / 2), 0, scale * (fieldY / 2));
-
-            postmax.transform.localPosition = new Vector3(scale * fieldX, scale * 0.25f, scale * fieldY);
-
-            
-
-            initilized = true;
+            timeLeftInGame = (gamePlayTime - (Time.time - gameStartTime));
+            if (timeLeftInGame <= 0)
+                gameStarted = false;
         }
-
     }
 
-    void OnGUI()
+    private void OnTriggerEnter(Collider other)
     {
-        Rect rectObj = new Rect(40, 10, 200, 400);
+        if (gameStarted)
+        {
+            score++;
+            Random.InitState((int)Time.time);
+            do
+            {
+                cubePosX = Random.Range((cubeSize / 2), fieldX - (cubeSize / 2));
+            } while (!((maincamera.transform.position.x / scale) + (fieldX / 3) < cubePosX) && !((maincamera.transform.position.x / scale) - (fieldX / 3) > cubePosX));
+            do
+            {
+                cubePosY = Random.Range((cubeSize / 2), fieldY - (cubeSize / 2));
+            } while (!((maincamera.transform.position.y / scale) + (fieldY / 3) < cubePosY) && !((maincamera.transform.position.y / scale) - (fieldY / 3) > cubePosY));
+        }
+    }
+
+    private void OnGUI()
+    {
+        Rect startStopButton = new Rect(40, 10, 50, 20);
+        Rect timeCounter = new Rect(100, 5, 50, 20);
+        Rect scoreBox = new Rect(480, 5, 50, 20);
         GUIStyle style = new GUIStyle();
         style.alignment = TextAnchor.UpperLeft;
-        style.fontSize = 50;
-        GUI.Box(rectObj, "# UDPReceive\n"+ IP +" " + port + " \n" + "\nLast Packet: \n" + lastReceivedUDPPacket, style);
+        style.fontSize = 27;
+        if (gameStarted)
+        {
+            
+            if (GUI.Button(startStopButton, "Stop"))
+            {
+                gameStarted = false;
+            }
+            GUI.Box(timeCounter, timeLeftInGame.ToString("0.0 s"), style);
+        }
+        else
+        {
+            cubeObj.SetActive(false);
+            if (GUI.Button(startStopButton, "Start"))
+            {
+                gameStarted = true;
+                gameStartTime = Time.time;
+                score = 0;
+                cubeObj.SetActive(true);
+                cubePosX = fieldX / 2;
+                cubePosY = fieldY / 2;
+            }
+            GUI.Box(timeCounter, gamePlayTime.ToString("0.0 s"), style);
+        }
+
+        GUI.Box(scoreBox, score.ToString("Score: 0"), style);
+
+
+
+
+
+
+
+
     }
 
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
-        SendUDP("SHUTDOWN");
+        //SendUDP("SHUTDOWN");
         //ReceiveACK();
         print("Application ending sending SHUTDOWN, disconecting...");
-        //client.Close();
     }
 
     private void UDPInitilize()
@@ -167,24 +216,17 @@ public class UDPReceive : MonoBehaviour
         {
             try
             {
-
                 byte[] data = client.Receive(ref ipendpoint);
-
                 text = Encoding.ASCII.GetString(data);
-
-                print(">> " + text);
-
-                lastReceivedUDPPacket = text;
-
                 GetData(text);
-
-                
+                print(">> " + text);
+                lastReceivedUDPPacket = text;
             }
-            catch (Exception err)
+            catch (System.Exception err)
             {
                 print(err.ToString());
             }
-        } while (text != "EXIT");
+        } while (true);
     }
    
 
