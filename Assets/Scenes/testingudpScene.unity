@@ -136,12 +136,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 45261124}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 3.36325, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 394858150}
-  m_RootOrder: 0
+  m_Children:
+  - {fileID: 394858150}
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &45261126
 MonoBehaviour:
@@ -150,7 +151,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 45261124}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91d060b9ead9a3546b0dfdc996353935, type: 3}
   m_Name: 
@@ -159,9 +160,9 @@ MonoBehaviour:
   borderWidth: 10
   cameraXAngleAdjust: 6.92
   cameraZAngleAdjust: 1.62
-  cubeTest: 23.49
+  cubeSize: 23.49
   freeCamera: 0
-  gameSeconds: 30
+  gamePlayTime: 30
 --- !u!1 &176482751
 GameObject:
   m_ObjectHideFlags: 0
@@ -449,14 +450,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 394858145}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 3.36325, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 45261125}
   - {fileID: 628914162}
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_Father: {fileID: 45261125}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &394858151
 MonoBehaviour:
@@ -465,7 +465,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 394858145}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 91d060b9ead9a3546b0dfdc996353935, type: 3}
   m_Name: 
@@ -474,9 +474,9 @@ MonoBehaviour:
   borderWidth: 10
   cameraXAngleAdjust: 6.92
   cameraZAngleAdjust: 1.62
-  cubeTest: 23.49
+  cubeSize: 23.49
   freeCamera: 0
-  gameSeconds: 30
+  gamePlayTime: 30
 --- !u!65 &394858152
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -519,7 +519,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 394858150}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &628914163
 MonoBehaviour:
