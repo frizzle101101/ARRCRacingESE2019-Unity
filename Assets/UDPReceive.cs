@@ -48,13 +48,18 @@ public class UDPReceive : MonoBehaviour
     public float cameraZAngleAdjust = 1.62f;
     public float cubeSize = 23.49f;
     public bool freeCamera = false;
+    public bool removeGUI = false;
     public float gamePlayTime = 30;
+    public float countdownTime = 5;
 
     private static bool ackFlag = false;
 
     private static bool gameStarted = false;
+    private static bool startedCountdown = false;
     private static float gameStartTime = 0;
+    private static float countdownStartTime = 0;
     private static float timeLeftInGame = 0;
+    private static float timeLeftInCountdown = 0;
 
     private static string lastReceivedUDPPacket = "";
 
@@ -66,7 +71,6 @@ public class UDPReceive : MonoBehaviour
     private static GameObject fieldYaxis;
     private static GameObject fieldXplus;
     private static GameObject fieldYplus;
-    private static GameObject postmax;
     private static GameObject cubeObj;
 
 
@@ -74,7 +78,7 @@ public class UDPReceive : MonoBehaviour
     {
         UDPInitilize();
         print("UDPInitilize() complete");
-
+        
         maincamera = GameObject.FindGameObjectWithTag("MainCamera");
         field = GameObject.FindGameObjectWithTag("Field");
         fieldXaxis = GameObject.FindGameObjectWithTag("FieldXaxis");
@@ -82,8 +86,10 @@ public class UDPReceive : MonoBehaviour
         fieldXplus = GameObject.FindGameObjectWithTag("FieldXplus");
         fieldYplus = GameObject.FindGameObjectWithTag("FieldYplus");
 
-        postmax = GameObject.FindGameObjectWithTag("LEDPostMax");
         cubeObj = GameObject.FindGameObjectWithTag("CubeTest");
+        cubeObj.GetComponent<Renderer>().material.SetColor("_Color", Color.yellow);
+
+        loadInitFromFile();
     }
 
     private void Update()
@@ -105,8 +111,18 @@ public class UDPReceive : MonoBehaviour
         fieldXplus.transform.localPosition = new Vector3(scale * (fieldX / 2), 0, scale * (fieldY + borderWidth / 2));
         fieldYplus.transform.localPosition = new Vector3(scale * (fieldX + borderWidth / 2), 0, scale * (fieldY / 2));
 
-        postmax.transform.localPosition = new Vector3(scale * fieldX, scale * 0.25f, scale * fieldY);
 
+        
+        if(startedCountdown)
+        {
+            timeLeftInCountdown = (countdownTime - (Time.time - countdownStartTime));
+            if (timeLeftInCountdown <= 0)
+            {
+                gameStarted = true;
+                startedCountdown = false;
+                gameStartTime = Time.time;
+            }
+        }
         if(gameStarted)
         {
             timeLeftInGame = (gamePlayTime - (Time.time - gameStartTime));
@@ -134,45 +150,54 @@ public class UDPReceive : MonoBehaviour
 
     private void OnGUI()
     {
-        Rect startStopButton = new Rect(40, 10, 50, 20);
-        Rect timeCounter = new Rect(100, 5, 50, 20);
-        Rect scoreBox = new Rect(480, 5, 50, 20);
-        GUIStyle style = new GUIStyle();
-        style.alignment = TextAnchor.UpperLeft;
-        style.fontSize = 27;
-        if (gameStarted)
+        if (!removeGUI)
         {
-            
-            if (GUI.Button(startStopButton, "Stop"))
+            Rect startStopButton = new Rect(40, 10, 50, 20);
+            Rect timeCounter = new Rect(300, 440, 50, 20);
+            Rect scoreBox = new Rect(500, 440, 50, 20);
+            Rect countdownBox = new Rect(0, 0, 640, 480);
+            GUIStyle style = new GUIStyle();
+            style.alignment = TextAnchor.UpperLeft;
+            style.fontStyle = FontStyle.Bold;
+            style.fontSize = 27;
+            style.normal.textColor = Color.red;
+            GUIStyle countdownStyle = new GUIStyle();
+            countdownStyle.alignment = TextAnchor.MiddleCenter;
+            countdownStyle.fontStyle = FontStyle.Bold;
+            countdownStyle.fontSize = 80;
+            countdownStyle.normal.textColor = Color.red;
+
+            GUI.Box(scoreBox, score.ToString("Score: 0"), style);
+            if (gameStarted)
             {
-                gameStarted = false;
+                if (GUI.Button(startStopButton, "Stop"))
+                {
+                    gameStarted = false;
+                }
+                GUI.Box(timeCounter, timeLeftInGame.ToString("0.0 s"), style);
             }
-            GUI.Box(timeCounter, timeLeftInGame.ToString("0.0 s"), style);
-        }
-        else
-        {
-            cubeObj.SetActive(false);
-            if (GUI.Button(startStopButton, "Start"))
+            else if (startedCountdown)
             {
-                gameStarted = true;
-                gameStartTime = Time.time;
-                score = 0;
+                GUI.Box(timeCounter, "", style);
+                GUI.Box(scoreBox, "", style);
+                GUI.Box(countdownBox, timeLeftInCountdown.ToString("0.0"), countdownStyle);
+
                 cubeObj.SetActive(true);
                 cubePosX = fieldX / 2;
                 cubePosY = fieldY / 2;
             }
-            GUI.Box(timeCounter, gamePlayTime.ToString("0.0 s"), style);
+            else
+            {
+                cubeObj.SetActive(false);
+                if (GUI.Button(startStopButton, "Start"))
+                {
+                    startedCountdown = true;
+                    countdownStartTime = Time.time;
+                    score = 0;
+                }
+                GUI.Box(timeCounter, gamePlayTime.ToString("0.0 s"), style);
+            }
         }
-
-        GUI.Box(scoreBox, score.ToString("Score: 0"), style);
-
-
-
-
-
-
-
-
     }
 
     private void OnApplicationQuit()
@@ -246,6 +271,8 @@ public class UDPReceive : MonoBehaviour
             fieldX = float.Parse(textsplit[2]);
             fieldY = float.Parse(textsplit[4]);
             scale = float.Parse(textsplit[6])/5.0f;
+
+            saveInitToFile();
         }
         else if (textsplit[0] == "SHUTDOWN")
         {
@@ -256,5 +283,32 @@ public class UDPReceive : MonoBehaviour
         {
             print("SHUTDOWN! Command detected");
         }
+    }
+
+    private class SaveObject
+    {
+        public float sfieldX;
+        public float sfieldY;
+        public float sscale;
+    }
+    private void saveInitToFile()
+    {
+        SaveObject saveInitObj = new SaveObject {
+            sfieldX = fieldX,
+            sfieldY = fieldY,
+            sscale = scale,
+        };
+        string json = JsonUtility.ToJson(saveInitObj);
+        print("Save file log: " + json);
+    }
+
+    private void loadInitFromFile()
+    {
+        string json = "";
+        SaveObject loadedInitObj = JsonUtility.FromJson<SaveObject>(json);
+
+        fieldX = loadedInitObj.sfieldX;
+        fieldY = loadedInitObj.sfieldY;
+        scale = loadedInitObj.sscale;
     }
 }
